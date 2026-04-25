@@ -1,0 +1,280 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>manath - AI Video for Websites</title>
+    
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+    
+    <!-- Tailwind CSS (CDN) -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        inter: ['Inter', 'sans-serif'],
+                        instrument: ['"Instrument Serif"', 'serif'],
+                    },
+                    colors: {
+                        dark: '#222222'
+                    }
+                }
+            }
+        }
+    </script>
+    
+    <!-- Custom CSS for animations and tweaks -->
+    <style>
+        :root {
+            --font-display: 'Instrument Serif', serif;
+            --font-body: 'Inter', sans-serif;
+        }
+
+        .nav-link {
+            position: relative;
+            transition: color 220ms ease;
+        }
+
+        .nav-link::after {
+            content: '';
+            position: absolute;
+            left: 50%;
+            bottom: -8px;
+            width: 0;
+            height: 1px;
+            transform: translateX(-50%);
+            background-color: currentColor;
+            transition: width 220ms ease;
+        }
+
+        .nav-link:hover::after,
+        .nav-link.is-active::after {
+            width: 18px;
+        }
+
+        .liquid-glass {
+            background: rgba(255, 255, 255, 0.04);
+            background-blend-mode: luminosity;
+            backdrop-filter: blur(8px);
+            -webkit-backdrop-filter: blur(8px);
+            border: none;
+            box-shadow: inset 0 1px 1px rgba(255, 255, 255, 0.18), 0 18px 60px rgba(0, 0, 0, 0.12);
+            overflow: hidden;
+            position: relative;
+        }
+
+        .liquid-glass::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            border-radius: inherit;
+            padding: 1.2px;
+            background: linear-gradient(
+                180deg,
+                rgba(255, 255, 255, 0.45) 0%,
+                rgba(255, 255, 255, 0.16) 20%,
+                rgba(255, 255, 255, 0) 42%,
+                rgba(255, 255, 255, 0) 58%,
+                rgba(255, 255, 255, 0.16) 80%,
+                rgba(255, 255, 255, 0.45) 100%
+            );
+            -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+            -webkit-mask-composite: xor;
+            mask-composite: exclude;
+            pointer-events: none;
+        }
+        
+        .cta-button,
+        .workreel-button {
+            transition: transform 220ms ease, background 220ms ease, box-shadow 220ms ease;
+        }
+
+        .cta-button:hover,
+        .workreel-button:hover {
+            transform: scale(1.03);
+        }
+
+        .cta-button:hover {
+            box-shadow: inset 0 1px 1px rgba(255, 255, 255, 0.2), 0 16px 44px rgba(0, 0, 0, 0.18);
+        }
+
+        .arrow-icon {
+            transition: transform 220ms ease;
+        }
+
+        .cta-button:hover .arrow-icon {
+            transform: translate(2px, -2px) rotate(45deg);
+        }
+        
+        .play-button-wrapper:hover .play-icon-bg {
+            transform: scale(1.1);
+        }
+
+        .hero-video {
+            filter: brightness(0.72) saturate(0.95);
+            transition: opacity 120ms linear;
+        }
+
+        .hero-video.is-active {
+            opacity: 1;
+        }
+
+        .hero-video:not(.is-active) {
+            opacity: 0;
+        }
+
+        @keyframes fade-rise {
+            from {
+                opacity: 0;
+                transform: translateY(24px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .animate-fade-rise {
+            animation: fade-rise 0.8s ease-out both;
+        }
+
+        .animate-fade-rise-delay {
+            animation: fade-rise 0.8s ease-out 0.2s both;
+        }
+
+        .animate-fade-rise-delay-2 {
+            animation: fade-rise 0.8s ease-out 0.4s both;
+        }
+
+        /* Ensure texts select nicely */
+        ::selection {
+            background: #ffffff;
+            color: #000000;
+        }
+    </style>
+</head>
+<body class="font-inter bg-black text-white antialiased overflow-x-hidden">
+
+    <!-- Hero Section -->
+    <section class="relative w-full min-h-screen overflow-hidden flex flex-col items-center px-5 py-6 md:px-10 md:py-8">
+        
+        <!-- Video Background -->
+        <video 
+            id="heroVideoForward"
+            autoplay 
+            muted 
+            playsinline 
+            preload="auto"
+            class="hero-video is-active absolute top-0 left-0 w-full h-full object-cover z-0 scale-[1.15]"
+        >
+            <source src="video_bg.mp4" type="video/mp4">
+            Your browser does not support the video tag.
+        </video>
+        <video 
+            id="heroVideoReverse"
+            muted 
+            playsinline 
+            preload="auto"
+            class="hero-video absolute top-0 left-0 w-full h-full object-cover z-0 scale-[1.15]"
+        >
+            <source src="video_bg_reverse.mp4" type="video/mp4">
+            Your browser does not support the video tag.
+        </video>
+        <!-- Content Overlay (keeps everything above video) -->
+        <div class="relative z-10 w-full max-w-7xl mx-auto flex flex-col items-center flex-grow">
+            
+            <!-- Navigation Bar -->
+            <nav class="w-full flex items-center justify-between gap-5 py-2 text-white">
+                <!-- Left: Logo -->
+                <div class="flex min-w-0 items-center">
+                    <a href="#" class="font-instrument text-[30px] leading-none text-white drop-shadow-sm">
+                        manath<sup class="ml-0.5 align-super text-[10px] font-inter">&reg;</sup>
+                    </a>
+                </div>
+
+                <!-- Center: Menu -->
+                <div class="hidden md:flex items-center gap-8">
+                    <a href="#" class="nav-link is-active text-[13px] font-medium text-white">Home</a>
+                    <a href="#" class="nav-link text-[13px] font-medium text-white/62 hover:text-white">Works</a>
+                    <a href="#" class="nav-link text-[13px] font-medium text-white/62 hover:text-white">Services</a>
+                    <a href="#" class="nav-link text-[13px] font-medium text-white/62 hover:text-white">About</a>
+                    <a href="#" class="nav-link text-[13px] font-medium text-white/62 hover:text-white">Contact</a>
+                </div>
+
+                <!-- Right: CTA -->
+                <div class="flex items-center justify-end">
+                    <a href="https://t.me/manath" target="_blank" rel="noopener noreferrer" class="cta-button liquid-glass flex items-center gap-3 rounded-full px-5 py-3 text-[13px] font-medium text-white">
+                        <span class="hidden sm:inline">Write on Telegram</span>
+                        <span class="sm:hidden">Telegram</span>
+                        <div class="flex h-6 w-6 items-center justify-center rounded-full bg-white/10">
+                            <svg class="arrow-icon w-4 h-4 text-white transition-transform duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 19L19 5M19 5H10M19 5V14"></path>
+                            </svg>
+                        </div>
+                    </a>
+                </div>
+            </nav>
+
+            <!-- Hero Main Content -->
+            <div class="flex-grow flex flex-col items-center justify-start text-center max-w-6xl w-full px-1 pb-16 pt-[16vh] md:pb-24 md:pt-[19vh]">
+                
+                <!-- Primary Headline -->
+                <h1 class="animate-fade-rise flex flex-col items-center justify-center gap-1 mb-5 drop-shadow-[0_18px_48px_rgba(0,0,0,0.34)]">
+                    <span class="font-inter font-medium text-[30px] leading-[1.06] text-white sm:text-[42px] md:text-[52px] lg:text-[62px]">
+                        Learn how AI video
+                    </span>
+                    <span class="font-instrument italic font-normal text-[56px] leading-[0.9] text-white/82 sm:text-[76px] md:text-[96px] lg:text-[108px]">
+                        turns websites alive
+                    </span>
+                </h1>
+
+                <!-- Subtext -->
+                <p class="animate-fade-rise-delay font-inter text-[14px] sm:text-[15px] md:text-[16px] text-white/72 max-w-xl mx-auto mb-8 leading-relaxed drop-shadow-md">
+                    Practical lessons on cinematic video effects, AI generation workflows, and how to embed motion into modern web experiences.
+                </p>
+
+                <!-- Secondary CTA -->
+                <a href="#" class="workreel-button liquid-glass play-button-wrapper animate-fade-rise-delay-2 inline-flex items-center gap-3 rounded-full py-2.5 pl-2.5 pr-5 text-white">
+                    <div class="play-icon-bg w-8 h-8 bg-white text-black rounded-full flex items-center justify-center transition-transform duration-300">
+                        <svg class="w-3.5 h-3.5 ml-0.5" fill="currentColor" viewBox="0 0 24 24">
+                            <path d="M8 5v14l11-7z"/>
+                        </svg>
+                    </div>
+                    <span class="font-inter font-medium text-[14px]">Explore Lessons</span>
+                </a>
+
+            </div>
+        </div>
+        
+    </section>
+
+    <script>
+        const forwardVideo = document.getElementById('heroVideoForward');
+        const reverseVideo = document.getElementById('heroVideoReverse');
+        const videos = [forwardVideo, reverseVideo];
+        let activeIndex = 0;
+
+        function activateVideo(nextIndex) {
+            const currentVideo = videos[activeIndex];
+            const nextVideo = videos[nextIndex];
+
+            nextVideo.currentTime = 0;
+            nextVideo.play().catch(() => {});
+            nextVideo.classList.add('is-active');
+            currentVideo.classList.remove('is-active');
+            currentVideo.pause();
+
+            activeIndex = nextIndex;
+        }
+
+        forwardVideo.addEventListener('ended', () => activateVideo(1));
+        reverseVideo.addEventListener('ended', () => activateVideo(0));
+    </script>
+
+</body>
+</html>
