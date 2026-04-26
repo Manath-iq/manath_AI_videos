@@ -9,6 +9,7 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+    <link rel="preload" href="example_scrub.mp4" as="video" type="video/mp4">
     
     <!-- Tailwind CSS (CDN) -->
     <script src="https://cdn.tailwindcss.com"></script>
@@ -128,6 +129,63 @@
             opacity: 0;
         }
 
+        .motion-section {
+            height: 380vh;
+            background: #000000;
+        }
+
+        .motion-stage {
+            height: 100svh;
+            --motion-copy-progress: 0;
+        }
+
+        .motion-video {
+            filter: brightness(0.78) contrast(1.04) saturate(0.96);
+        }
+
+        .motion-shade {
+            background:
+                linear-gradient(90deg, rgba(0, 0, 0, 0.78) 0%, rgba(0, 0, 0, 0.34) 24%, rgba(0, 0, 0, 0.08) 48%, rgba(0, 0, 0, 0.34) 76%, rgba(0, 0, 0, 0.78) 100%),
+                linear-gradient(180deg, rgba(0, 0, 0, 0.48) 0%, transparent 28%, transparent 58%, rgba(0, 0, 0, 0.72) 100%);
+        }
+
+        .motion-side {
+            opacity: var(--motion-copy-progress);
+            transform: translateY(calc((1 - var(--motion-copy-progress)) * 18px));
+            text-shadow: 0 18px 48px rgba(0, 0, 0, 0.64);
+            transition: opacity 180ms linear, transform 180ms ease-out;
+            will-change: opacity, transform;
+        }
+
+        .motion-kicker {
+            display: inline-flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .motion-kicker::before {
+            content: '';
+            width: 42px;
+            height: 1px;
+            background: rgba(255, 255, 255, 0.38);
+        }
+
+        .motion-link {
+            transition: color 220ms ease, transform 220ms ease;
+        }
+
+        .motion-link:hover {
+            color: rgba(255, 255, 255, 0.96);
+            transform: translateX(2px);
+        }
+
+        @media (max-width: 767px) {
+            .motion-shade {
+                background:
+                    linear-gradient(180deg, rgba(0, 0, 0, 0.68) 0%, rgba(0, 0, 0, 0.08) 38%, rgba(0, 0, 0, 0.78) 100%);
+            }
+        }
+
         @keyframes fade-rise {
             from {
                 opacity: 0;
@@ -200,7 +258,7 @@
                 <!-- Center: Menu -->
                 <div class="hidden md:flex items-center gap-8">
                     <a href="#" class="nav-link is-active text-[13px] font-medium text-white">Home</a>
-                    <a href="#" class="nav-link text-[13px] font-medium text-white/62 hover:text-white">Works</a>
+                    <a href="#motion-effect" class="nav-link text-[13px] font-medium text-white/62 hover:text-white">Works</a>
                     <a href="#" class="nav-link text-[13px] font-medium text-white/62 hover:text-white">Services</a>
                     <a href="#" class="nav-link text-[13px] font-medium text-white/62 hover:text-white">About</a>
                     <a href="#" class="nav-link text-[13px] font-medium text-white/62 hover:text-white">Contact</a>
@@ -239,7 +297,7 @@
                 </p>
 
                 <!-- Secondary CTA -->
-                <a href="#" class="workreel-button liquid-glass play-button-wrapper animate-fade-rise-delay-2 inline-flex items-center gap-3 rounded-full py-2.5 pl-2.5 pr-5 text-white">
+                <a href="#motion-effect" class="workreel-button liquid-glass play-button-wrapper animate-fade-rise-delay-2 inline-flex items-center gap-3 rounded-full py-2.5 pl-2.5 pr-5 text-white">
                     <div class="play-icon-bg w-8 h-8 bg-white text-black rounded-full flex items-center justify-center transition-transform duration-300">
                         <svg class="w-3.5 h-3.5 ml-0.5" fill="currentColor" viewBox="0 0 24 24">
                             <path d="M8 5v14l11-7z"/>
@@ -251,6 +309,61 @@
             </div>
         </div>
         
+    </section>
+
+    <!-- Scroll Motion Effect Section -->
+    <section id="motion-effect" class="motion-section relative w-full">
+        <div class="motion-stage sticky top-0 overflow-hidden">
+            <video
+                id="scrollMotionVideo"
+                class="motion-video absolute inset-0 h-full w-full object-cover"
+                muted
+                playsinline
+                preload="auto"
+                disablepictureinpicture
+            >
+                <source src="example_scrub.mp4" type="video/mp4">
+                <source src="example.mp4" type="video/mp4">
+                Your browser does not support the video tag.
+            </video>
+
+            <div class="motion-shade pointer-events-none absolute inset-0"></div>
+
+            <div class="relative z-10 mx-auto flex h-full w-full max-w-7xl flex-col justify-between px-5 py-8 md:grid md:grid-cols-[minmax(210px,300px)_1fr_minmax(210px,300px)] md:items-center md:gap-10 md:px-10 md:py-10">
+                <aside class="motion-side max-w-[330px] text-left md:self-center">
+                    <p class="motion-kicker mb-5 font-inter text-[10px] font-medium uppercase tracking-[0.28em] text-white/48">
+                    Эффект прокрутки
+                    </p>
+                    <h2 class="mb-5 font-inter text-[28px] font-medium leading-[1.04] text-white sm:text-[34px] md:text-[36px]">
+                        Видео движется вместе с прокруткой
+                    </h2>
+                    <p class="font-inter text-[14px] font-normal leading-relaxed text-white/64 md:text-[15px]">
+                        Сцена раскрывается кадр за кадром, пока пользователь ведет страницу вниз. Так обычный блок превращается в управляемый кинематографичный момент.
+                    </p>
+                </aside>
+
+                <div class="hidden md:block"></div>
+
+                <aside class="motion-side max-w-[310px] text-left md:self-end md:pb-[12vh]">
+                    <p class="motion-kicker mb-5 font-inter text-[10px] font-medium uppercase tracking-[0.28em] text-white/48">
+                        Референсы
+                    </p>
+                    <p class="mb-6 font-instrument italic text-[42px] leading-[0.9] text-white/84 sm:text-[48px] md:text-[54px]">
+                        живой motion для hero
+                    </p>
+                    <div class="flex flex-col gap-3">
+                        <a href="https://motionsites.ai/?prompt=urban-jungle-hero" target="_blank" rel="noopener noreferrer" class="motion-link inline-flex items-center gap-3 font-inter text-[13px] font-medium text-white/68">
+                            <span>Urban jungle hero</span>
+                            <span class="text-white/38">&#8599;</span>
+                        </a>
+                        <a href="https://motionsites.ai/?prompt=wisa-space-hero" target="_blank" rel="noopener noreferrer" class="motion-link inline-flex items-center gap-3 font-inter text-[13px] font-medium text-white/68">
+                            <span>Wisa space hero</span>
+                            <span class="text-white/38">&#8599;</span>
+                        </a>
+                    </div>
+                </aside>
+            </div>
+        </div>
     </section>
 
     <script>
@@ -274,6 +387,60 @@
 
         forwardVideo.addEventListener('ended', () => activateVideo(1));
         reverseVideo.addEventListener('ended', () => activateVideo(0));
+
+        const motionSection = document.getElementById('motion-effect');
+        const motionStage = motionSection.querySelector('.motion-stage');
+        const scrollMotionVideo = document.getElementById('scrollMotionVideo');
+        let scrollVideoDuration = 8;
+        let targetScrollTime = 0;
+        let motionProgress = 0;
+        let lastAppliedTime = -1;
+        let scrubReady = false;
+
+        function clamp(value, min, max) {
+            return Math.min(Math.max(value, min), max);
+        }
+
+        function getMotionProgress() {
+            const rect = motionSection.getBoundingClientRect();
+            const distance = Math.max(1, motionSection.offsetHeight - window.innerHeight);
+            return clamp(-rect.top / distance, 0, 1);
+        }
+
+        function updateScrollTarget() {
+            motionProgress = getMotionProgress();
+            targetScrollTime = motionProgress * scrollVideoDuration;
+
+            const copyProgress = clamp((motionProgress - 0.08) / 0.18, 0, 1);
+            motionStage.style.setProperty('--motion-copy-progress', copyProgress.toFixed(3));
+        }
+
+        scrollMotionVideo.addEventListener('loadedmetadata', () => {
+            scrollVideoDuration = scrollMotionVideo.duration || scrollVideoDuration;
+            scrubReady = true;
+            scrollMotionVideo.pause();
+            updateScrollTarget();
+        });
+
+        function scrubVideoFrame() {
+            updateScrollTarget();
+
+            if (scrubReady) {
+                const frameStep = 1 / 24;
+                const nextTime = clamp(targetScrollTime, 0, Math.max(0, scrollVideoDuration - frameStep));
+
+                if (Math.abs(nextTime - lastAppliedTime) >= frameStep * 0.45) {
+                    scrollMotionVideo.currentTime = nextTime;
+                    lastAppliedTime = nextTime;
+                }
+            }
+
+            window.requestAnimationFrame(scrubVideoFrame);
+        }
+
+        window.addEventListener('resize', updateScrollTarget);
+        updateScrollTarget();
+        window.requestAnimationFrame(scrubVideoFrame);
     </script>
 
 </body>
