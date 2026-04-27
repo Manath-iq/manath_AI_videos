@@ -1,447 +1,139 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="ru">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>manath - AI Video for Websites</title>
-    
-    <!-- Google Fonts -->
+
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Outfit:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link rel="preload" href="example_scrub.mp4" as="video" type="video/mp4">
-    
-    <!-- Tailwind CSS (CDN) -->
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script>
-        tailwind.config = {
-            theme: {
-                extend: {
-                    fontFamily: {
-                        inter: ['Inter', 'sans-serif'],
-                        instrument: ['"Instrument Serif"', 'serif'],
-                    },
-                    colors: {
-                        dark: '#222222'
-                    }
-                }
-            }
-        }
-    </script>
-    
-    <!-- Custom CSS for animations and tweaks -->
-    <style>
-        :root {
-            --font-display: 'Instrument Serif', serif;
-            --font-body: 'Inter', sans-serif;
-        }
-
-        .nav-link {
-            position: relative;
-            transition: color 220ms ease;
-        }
-
-        .nav-link::after {
-            content: '';
-            position: absolute;
-            left: 50%;
-            bottom: -8px;
-            width: 0;
-            height: 1px;
-            transform: translateX(-50%);
-            background-color: currentColor;
-            transition: width 220ms ease;
-        }
-
-        .nav-link:hover::after,
-        .nav-link.is-active::after {
-            width: 18px;
-        }
-
-        .liquid-glass {
-            background: rgba(255, 255, 255, 0.04);
-            background-blend-mode: luminosity;
-            backdrop-filter: blur(8px);
-            -webkit-backdrop-filter: blur(8px);
-            border: none;
-            box-shadow: inset 0 1px 1px rgba(255, 255, 255, 0.18), 0 18px 60px rgba(0, 0, 0, 0.12);
-            overflow: hidden;
-            position: relative;
-        }
-
-        .liquid-glass::before {
-            content: '';
-            position: absolute;
-            inset: 0;
-            border-radius: inherit;
-            padding: 1.2px;
-            background: linear-gradient(
-                180deg,
-                rgba(255, 255, 255, 0.45) 0%,
-                rgba(255, 255, 255, 0.16) 20%,
-                rgba(255, 255, 255, 0) 42%,
-                rgba(255, 255, 255, 0) 58%,
-                rgba(255, 255, 255, 0.16) 80%,
-                rgba(255, 255, 255, 0.45) 100%
-            );
-            -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
-            -webkit-mask-composite: xor;
-            mask-composite: exclude;
-            pointer-events: none;
-        }
-        
-        .cta-button,
-        .workreel-button {
-            transition: transform 220ms ease, background 220ms ease, box-shadow 220ms ease;
-        }
-
-        .cta-button:hover,
-        .workreel-button:hover {
-            transform: scale(1.03);
-        }
-
-        .cta-button:hover {
-            box-shadow: inset 0 1px 1px rgba(255, 255, 255, 0.2), 0 16px 44px rgba(0, 0, 0, 0.18);
-        }
-
-        .arrow-icon {
-            transition: transform 220ms ease;
-        }
-
-        .cta-button:hover .arrow-icon {
-            transform: translate(2px, -2px) rotate(45deg);
-        }
-        
-        .play-button-wrapper:hover .play-icon-bg {
-            transform: scale(1.1);
-        }
-
-        .hero-video {
-            filter: brightness(0.72) saturate(0.95);
-            transition: opacity 120ms linear;
-        }
-
-        .hero-video.is-active {
-            opacity: 1;
-        }
-
-        .hero-video:not(.is-active) {
-            opacity: 0;
-        }
-
-        .motion-section {
-            height: 380vh;
-            background: #000000;
-        }
-
-        .motion-stage {
-            height: 100svh;
-            --motion-copy-progress: 0;
-        }
-
-        .motion-video {
-            filter: brightness(0.78) contrast(1.04) saturate(0.96);
-        }
-
-        .motion-shade {
-            background:
-                linear-gradient(90deg, rgba(0, 0, 0, 0.78) 0%, rgba(0, 0, 0, 0.34) 24%, rgba(0, 0, 0, 0.08) 48%, rgba(0, 0, 0, 0.34) 76%, rgba(0, 0, 0, 0.78) 100%),
-                linear-gradient(180deg, rgba(0, 0, 0, 0.48) 0%, transparent 28%, transparent 58%, rgba(0, 0, 0, 0.72) 100%);
-        }
-
-        .motion-side {
-            opacity: var(--motion-copy-progress);
-            transform: translateY(calc((1 - var(--motion-copy-progress)) * 18px));
-            text-shadow: 0 18px 48px rgba(0, 0, 0, 0.64);
-            transition: opacity 180ms linear, transform 180ms ease-out;
-            will-change: opacity, transform;
-        }
-
-        .motion-kicker {
-            display: inline-flex;
-            align-items: center;
-            gap: 12px;
-        }
-
-        .motion-kicker::before {
-            content: '';
-            width: 42px;
-            height: 1px;
-            background: rgba(255, 255, 255, 0.38);
-        }
-
-        .motion-link {
-            transition: color 220ms ease, transform 220ms ease;
-        }
-
-        .motion-link:hover {
-            color: rgba(255, 255, 255, 0.96);
-            transform: translateX(2px);
-        }
-
-        @media (max-width: 767px) {
-            .motion-shade {
-                background:
-                    linear-gradient(180deg, rgba(0, 0, 0, 0.68) 0%, rgba(0, 0, 0, 0.08) 38%, rgba(0, 0, 0, 0.78) 100%);
-            }
-        }
-
-        @keyframes fade-rise {
-            from {
-                opacity: 0;
-                transform: translateY(24px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
-
-        .animate-fade-rise {
-            animation: fade-rise 0.8s ease-out both;
-        }
-
-        .animate-fade-rise-delay {
-            animation: fade-rise 0.8s ease-out 0.2s both;
-        }
-
-        .animate-fade-rise-delay-2 {
-            animation: fade-rise 0.8s ease-out 0.4s both;
-        }
-
-        /* Ensure texts select nicely */
-        ::selection {
-            background: #ffffff;
-            color: #000000;
-        }
-    </style>
+    <link rel="stylesheet" href="styles.css">
 </head>
-<body class="font-inter bg-black text-white antialiased overflow-x-hidden">
+<body>
+    <header class="site-header" data-reveal>
+        <a class="brand-mark" href="#top" aria-label="manath home">
+            manath<sup>&reg;</sup>
+        </a>
 
-    <!-- Hero Section -->
-    <section class="relative w-full min-h-screen overflow-hidden flex flex-col items-center px-5 py-6 md:px-10 md:py-8">
-        
-        <!-- Video Background -->
-        <video 
-            id="heroVideoForward"
-            autoplay 
-            muted 
-            playsinline 
-            preload="auto"
-            class="hero-video is-active absolute top-0 left-0 w-full h-full object-cover z-0 scale-[1.15]"
-        >
-            <source src="video_bg.mp4" type="video/mp4">
-            Your browser does not support the video tag.
-        </video>
-        <video 
-            id="heroVideoReverse"
-            muted 
-            playsinline 
-            preload="auto"
-            class="hero-video absolute top-0 left-0 w-full h-full object-cover z-0 scale-[1.15]"
-        >
-            <source src="video_bg_reverse.mp4" type="video/mp4">
-            Your browser does not support the video tag.
-        </video>
-        <!-- Content Overlay (keeps everything above video) -->
-        <div class="relative z-10 w-full max-w-7xl mx-auto flex flex-col items-center flex-grow">
-            
-            <!-- Navigation Bar -->
-            <nav class="w-full flex items-center justify-between gap-5 py-2 text-white">
-                <!-- Left: Logo -->
-                <div class="flex min-w-0 items-center">
-                    <a href="#" class="font-instrument text-[30px] leading-none text-white drop-shadow-sm">
-                        manath<sup class="ml-0.5 align-super text-[10px] font-inter">&reg;</sup>
-                    </a>
+        <nav class="site-nav" aria-label="Primary navigation">
+            <a class="site-nav__link is-active" href="#top">Home</a>
+            <a class="site-nav__link" href="#motion-effect">Works</a>
+            <a class="site-nav__link" href="https://t.me/manath" target="_blank" rel="noopener noreferrer">Contact</a>
+        </nav>
+
+        <a class="magnetic-button site-header__cta" href="https://t.me/manath" target="_blank" rel="noopener noreferrer" data-magnetic>
+            <span>Telegram</span>
+            <span class="button-icon" aria-hidden="true">
+                <svg viewBox="0 0 24 24" fill="none">
+                    <path d="M7 17L17 7M17 7H9M17 7V15" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+            </span>
+        </a>
+    </header>
+
+    <main id="top">
+        <section class="hero-section" aria-labelledby="hero-title">
+            <div class="hero-media" aria-hidden="true">
+                <video id="heroVideoForward" class="hero-video is-active" autoplay muted playsinline preload="auto">
+                    <source src="video_bg.mp4" type="video/mp4">
+                </video>
+                <video id="heroVideoReverse" class="hero-video" muted playsinline preload="auto">
+                    <source src="video_bg_reverse.mp4" type="video/mp4">
+                </video>
+                <div class="hero-media__shade"></div>
+            </div>
+
+            <div class="hero-layout page-shell">
+                <div class="hero-copy" data-reveal>
+                    <p class="section-label">AI video for websites</p>
+                    <h1 id="hero-title">
+                        Motion that lets the page breathe.
+                    </h1>
+                    <p class="hero-copy__lead">
+                        Влоги о том, как AI-видео, скролл и аккуратная режиссура превращают обычный экран в живую сцену.
+                    </p>
+                    <div class="hero-actions">
+                        <a class="magnetic-button magnetic-button--light" href="#motion-effect" data-magnetic>
+                            <span>Смотреть влог</span>
+                            <span class="button-icon" aria-hidden="true">
+                                <svg viewBox="0 0 24 24" fill="none">
+                                    <path d="M8 5V19L19 12L8 5Z" fill="currentColor"/>
+                                </svg>
+                            </span>
+                        </a>
+                        <p class="hero-actions__note">Lesson 02 / scroll-scrub motion</p>
+                    </div>
                 </div>
+            </div>
+        </section>
 
-                <!-- Center: Menu -->
-                <div class="hidden md:flex items-center gap-8">
-                    <a href="#" class="nav-link is-active text-[13px] font-medium text-white">Home</a>
-                    <a href="#motion-effect" class="nav-link text-[13px] font-medium text-white/62 hover:text-white">Works</a>
-                    <a href="#" class="nav-link text-[13px] font-medium text-white/62 hover:text-white">Services</a>
-                    <a href="#" class="nav-link text-[13px] font-medium text-white/62 hover:text-white">About</a>
-                    <a href="#" class="nav-link text-[13px] font-medium text-white/62 hover:text-white">Contact</a>
-                </div>
+        <section
+            id="motion-effect"
+            class="motion-section"
+            data-motion-section
+            data-motion-duration="8"
+            data-motion-copy-start="0.06"
+            data-motion-copy-end="0.24"
+            aria-labelledby="motion-title"
+        >
+            <div class="motion-stage" data-motion-stage>
+                <video class="motion-video" data-motion-video muted playsinline preload="auto" disablepictureinpicture>
+                    <source src="example_scrub.mp4" type="video/mp4">
+                    <source src="example.mp4" type="video/mp4">
+                </video>
+                <div class="motion-stage__shade" aria-hidden="true"></div>
 
-                <!-- Right: CTA -->
-                <div class="flex items-center justify-end">
-                    <a href="https://t.me/manath" target="_blank" rel="noopener noreferrer" class="cta-button liquid-glass flex items-center gap-3 rounded-full px-5 py-3 text-[13px] font-medium text-white">
-                        <span class="hidden sm:inline">Write on Telegram</span>
-                        <span class="sm:hidden">Telegram</span>
-                        <div class="flex h-6 w-6 items-center justify-center rounded-full bg-white/10">
-                            <svg class="arrow-icon w-4 h-4 text-white transition-transform duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 19L19 5M19 5H10M19 5V14"></path>
-                            </svg>
+                <div class="motion-layout page-shell">
+                    <article class="motion-story" data-motion-copy>
+                        <p class="section-label">Влог 02</p>
+                        <h2 id="motion-title">Почему эта анимация цепляет</h2>
+
+                        <div class="story-track">
+                            <span class="story-track__rail" aria-hidden="true"></span>
+                            <span class="story-track__progress" data-motion-progress aria-hidden="true"></span>
+
+                            <section class="story-step is-active" data-motion-step data-range="0.05 0.24">
+                                <p class="story-step__eyebrow">01 / Контроль</p>
+                                <h3>Пользователь становится монтажером</h3>
+                                <p>Скролл двигает сцену кадр за кадром, поэтому человек не просто смотрит ролик, а физически управляет моментом.</p>
+                            </section>
+
+                            <section class="story-step" data-motion-step data-range="0.24 0.46">
+                                <p class="story-step__eyebrow">02 / Ожидание</p>
+                                <h3>Движение держит паузу</h3>
+                                <p>Объект раскрывается постепенно. Эта задержка создаёт маленькое напряжение и желание доскроллить до следующего поворота.</p>
+                            </section>
+
+                            <section class="story-step" data-motion-step data-range="0.46 0.68">
+                                <p class="story-step__eyebrow">03 / Смысл</p>
+                                <h3>Видео объясняет быстрее текста</h3>
+                                <p>Сайт перестаёт быть плоской страницей. Он становится сценой, где идея показывается через темп, глубину и смену фокуса.</p>
+                            </section>
+
+                            <section class="story-step" data-motion-step data-range="0.68 0.9">
+                                <p class="story-step__eyebrow">04 / Память</p>
+                                <h3>Трюк хочется повторить</h3>
+                                <p>Когда анимация реагирует на руку, она ощущается как личное открытие. Такие моменты запоминают лучше обычного блока.</p>
+                            </section>
                         </div>
-                    </a>
+                    </article>
+
+                    <aside class="motion-meta" data-motion-copy>
+                        <p class="section-label">References</p>
+                        <p class="motion-meta__headline">motion as a product surface</p>
+                        <div class="motion-meta__links">
+                            <a href="https://motionsites.ai/?prompt=urban-jungle-hero" target="_blank" rel="noopener noreferrer">Urban jungle hero</a>
+                            <a href="https://motionsites.ai/?prompt=wisa-space-hero" target="_blank" rel="noopener noreferrer">Wisa space hero</a>
+                        </div>
+                    </aside>
                 </div>
-            </nav>
-
-            <!-- Hero Main Content -->
-            <div class="flex-grow flex flex-col items-center justify-start text-center max-w-6xl w-full px-1 pb-16 pt-[16vh] md:pb-24 md:pt-[19vh]">
-                
-                <!-- Primary Headline -->
-                <h1 class="animate-fade-rise flex flex-col items-center justify-center gap-1 mb-5 drop-shadow-[0_18px_48px_rgba(0,0,0,0.34)]">
-                    <span class="font-inter font-medium text-[30px] leading-[1.06] text-white sm:text-[42px] md:text-[52px] lg:text-[62px]">
-                        Learn how AI video
-                    </span>
-                    <span class="font-instrument italic font-normal text-[56px] leading-[0.9] text-white/82 sm:text-[76px] md:text-[96px] lg:text-[108px]">
-                        turns websites alive
-                    </span>
-                </h1>
-
-                <!-- Subtext -->
-                <p class="animate-fade-rise-delay font-inter text-[14px] sm:text-[15px] md:text-[16px] text-white/72 max-w-xl mx-auto mb-8 leading-relaxed drop-shadow-md">
-                    Practical lessons on cinematic video effects, AI generation workflows, and how to embed motion into modern web experiences.
-                </p>
-
-                <!-- Secondary CTA -->
-                <a href="#motion-effect" class="workreel-button liquid-glass play-button-wrapper animate-fade-rise-delay-2 inline-flex items-center gap-3 rounded-full py-2.5 pl-2.5 pr-5 text-white">
-                    <div class="play-icon-bg w-8 h-8 bg-white text-black rounded-full flex items-center justify-center transition-transform duration-300">
-                        <svg class="w-3.5 h-3.5 ml-0.5" fill="currentColor" viewBox="0 0 24 24">
-                            <path d="M8 5v14l11-7z"/>
-                        </svg>
-                    </div>
-                    <span class="font-inter font-medium text-[14px]">Explore Lessons</span>
-                </a>
-
             </div>
-        </div>
-        
-    </section>
+        </section>
 
-    <!-- Scroll Motion Effect Section -->
-    <section id="motion-effect" class="motion-section relative w-full">
-        <div class="motion-stage sticky top-0 overflow-hidden">
-            <video
-                id="scrollMotionVideo"
-                class="motion-video absolute inset-0 h-full w-full object-cover"
-                muted
-                playsinline
-                preload="auto"
-                disablepictureinpicture
-            >
-                <source src="example_scrub.mp4" type="video/mp4">
-                <source src="example.mp4" type="video/mp4">
-                Your browser does not support the video tag.
-            </video>
+    </main>
 
-            <div class="motion-shade pointer-events-none absolute inset-0"></div>
-
-            <div class="relative z-10 mx-auto flex h-full w-full max-w-7xl flex-col justify-between px-5 py-8 md:grid md:grid-cols-[minmax(210px,300px)_1fr_minmax(210px,300px)] md:items-center md:gap-10 md:px-10 md:py-10">
-                <aside class="motion-side max-w-[330px] text-left md:self-center">
-                    <p class="motion-kicker mb-5 font-inter text-[10px] font-medium uppercase tracking-[0.28em] text-white/48">
-                    Эффект прокрутки
-                    </p>
-                    <h2 class="mb-5 font-inter text-[28px] font-medium leading-[1.04] text-white sm:text-[34px] md:text-[36px]">
-                        Видео движется вместе с прокруткой
-                    </h2>
-                    <p class="font-inter text-[14px] font-normal leading-relaxed text-white/64 md:text-[15px]">
-                        Сцена раскрывается кадр за кадром, пока пользователь ведет страницу вниз. Так обычный блок превращается в управляемый кинематографичный момент.
-                    </p>
-                </aside>
-
-                <div class="hidden md:block"></div>
-
-                <aside class="motion-side max-w-[310px] text-left md:self-end md:pb-[12vh]">
-                    <p class="motion-kicker mb-5 font-inter text-[10px] font-medium uppercase tracking-[0.28em] text-white/48">
-                        Референсы
-                    </p>
-                    <p class="mb-6 font-instrument italic text-[42px] leading-[0.9] text-white/84 sm:text-[48px] md:text-[54px]">
-                        живой motion для hero
-                    </p>
-                    <div class="flex flex-col gap-3">
-                        <a href="https://motionsites.ai/?prompt=urban-jungle-hero" target="_blank" rel="noopener noreferrer" class="motion-link inline-flex items-center gap-3 font-inter text-[13px] font-medium text-white/68">
-                            <span>Urban jungle hero</span>
-                            <span class="text-white/38">&#8599;</span>
-                        </a>
-                        <a href="https://motionsites.ai/?prompt=wisa-space-hero" target="_blank" rel="noopener noreferrer" class="motion-link inline-flex items-center gap-3 font-inter text-[13px] font-medium text-white/68">
-                            <span>Wisa space hero</span>
-                            <span class="text-white/38">&#8599;</span>
-                        </a>
-                    </div>
-                </aside>
-            </div>
-        </div>
-    </section>
-
-    <script>
-        const forwardVideo = document.getElementById('heroVideoForward');
-        const reverseVideo = document.getElementById('heroVideoReverse');
-        const videos = [forwardVideo, reverseVideo];
-        let activeIndex = 0;
-
-        function activateVideo(nextIndex) {
-            const currentVideo = videos[activeIndex];
-            const nextVideo = videos[nextIndex];
-
-            nextVideo.currentTime = 0;
-            nextVideo.play().catch(() => {});
-            nextVideo.classList.add('is-active');
-            currentVideo.classList.remove('is-active');
-            currentVideo.pause();
-
-            activeIndex = nextIndex;
-        }
-
-        forwardVideo.addEventListener('ended', () => activateVideo(1));
-        reverseVideo.addEventListener('ended', () => activateVideo(0));
-
-        const motionSection = document.getElementById('motion-effect');
-        const motionStage = motionSection.querySelector('.motion-stage');
-        const scrollMotionVideo = document.getElementById('scrollMotionVideo');
-        let scrollVideoDuration = 8;
-        let targetScrollTime = 0;
-        let motionProgress = 0;
-        let lastAppliedTime = -1;
-        let scrubReady = false;
-
-        function clamp(value, min, max) {
-            return Math.min(Math.max(value, min), max);
-        }
-
-        function getMotionProgress() {
-            const rect = motionSection.getBoundingClientRect();
-            const distance = Math.max(1, motionSection.offsetHeight - window.innerHeight);
-            return clamp(-rect.top / distance, 0, 1);
-        }
-
-        function updateScrollTarget() {
-            motionProgress = getMotionProgress();
-            targetScrollTime = motionProgress * scrollVideoDuration;
-
-            const copyProgress = clamp((motionProgress - 0.08) / 0.18, 0, 1);
-            motionStage.style.setProperty('--motion-copy-progress', copyProgress.toFixed(3));
-        }
-
-        scrollMotionVideo.addEventListener('loadedmetadata', () => {
-            scrollVideoDuration = scrollMotionVideo.duration || scrollVideoDuration;
-            scrubReady = true;
-            scrollMotionVideo.pause();
-            updateScrollTarget();
-        });
-
-        function scrubVideoFrame() {
-            updateScrollTarget();
-
-            if (scrubReady) {
-                const frameStep = 1 / 24;
-                const nextTime = clamp(targetScrollTime, 0, Math.max(0, scrollVideoDuration - frameStep));
-
-                if (Math.abs(nextTime - lastAppliedTime) >= frameStep * 0.45) {
-                    scrollMotionVideo.currentTime = nextTime;
-                    lastAppliedTime = nextTime;
-                }
-            }
-
-            window.requestAnimationFrame(scrubVideoFrame);
-        }
-
-        window.addEventListener('resize', updateScrollTarget);
-        updateScrollTarget();
-        window.requestAnimationFrame(scrubVideoFrame);
-    </script>
-
+    <script src="motion-scroll.js" defer></script>
 </body>
 </html>
