@@ -3,3 +3,5 @@ node_modules/
 dist/
 .env
 example.mp4
+
+design_style.md
