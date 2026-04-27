@@ -189,7 +189,181 @@ function setupMotionEngine() {
     window.requestAnimationFrame(frame);
 }
 
+function setupStoneEffect() {
+    const stoneSection = document.getElementById('stone-effect');
+    const canvas = document.getElementById('stoneCanvas');
+    if (!stoneSection || !canvas) return;
+
+    const ctx = canvas.getContext('2d');
+    const maskCanvas = document.createElement('canvas');
+    const maskCtx = maskCanvas.getContext('2d');
+
+    let width = 0;
+    let height = 0;
+    let dpr = 1;
+    
+    let mouse = { x: -1000, y: -1000 };
+    let current = { x: -1000, y: -1000 };
+    let isHovering = false;
+
+    // Load image reliably via JS
+    const nakedImg = new Image();
+    nakedImg.src = 'stone_naked.png';
+
+    function resize() {
+        width = stoneSection.clientWidth;
+        height = stoneSection.clientHeight;
+        dpr = Math.min(window.devicePixelRatio || 1, 2); // Cap at 2 for performance
+        
+        canvas.width = width * dpr;
+        canvas.height = height * dpr;
+        maskCanvas.width = width * dpr;
+        maskCanvas.height = height * dpr;
+        
+        ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+        maskCtx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    }
+
+    window.addEventListener('resize', resize);
+    resize();
+
+    stoneSection.addEventListener('mousemove', (e) => {
+        const rect = stoneSection.getBoundingClientRect();
+        mouse.x = e.clientX - rect.left;
+        mouse.y = e.clientY - rect.top;
+        isHovering = true;
+        
+        // Parallax effect
+        const cx = width / 2;
+        const cy = height / 2;
+        const moveX = (mouse.x - cx) * -0.02;
+        const moveY = (mouse.y - cy) * -0.02;
+        const layout = stoneSection.querySelector('.stone-layout');
+        if(layout) layout.style.transform = `translate3d(${moveX}px, ${moveY}px, 0)`;
+    });
+
+    stoneSection.addEventListener('mouseleave', () => {
+        isHovering = false;
+        const layout = stoneSection.querySelector('.stone-layout');
+        if(layout) layout.style.transform = `translate3d(0, 0, 0)`;
+    });
+
+    if (nakedImg.complete) {
+        startAnimation();
+    } else {
+        nakedImg.addEventListener('load', startAnimation);
+    }
+
+    function startAnimation() {
+        requestAnimationFrame(render);
+    }
+
+    function render() {
+        // Spring easing for smooth brush following
+        current.x += (mouse.x - current.x) * 0.15;
+        current.y += (mouse.y - current.y) * 0.15;
+
+        // Fade the mask to create a trail
+        maskCtx.globalCompositeOperation = 'destination-out';
+        maskCtx.fillStyle = 'rgba(0, 0, 0, 0.08)';
+        maskCtx.fillRect(0, 0, width, height);
+
+        // Draw new mask circle
+        if (isHovering) {
+            maskCtx.globalCompositeOperation = 'source-over';
+            const radius = 220; // Radius of brush
+            const gradient = maskCtx.createRadialGradient(current.x, current.y, 0, current.x, current.y, radius);
+            gradient.addColorStop(0, 'rgba(0, 0, 0, 1)');
+            gradient.addColorStop(0.3, 'rgba(0, 0, 0, 0.8)');
+            gradient.addColorStop(1, 'rgba(0, 0, 0, 0)');
+            
+            maskCtx.fillStyle = gradient;
+            maskCtx.beginPath();
+            maskCtx.arc(current.x, current.y, radius, 0, Math.PI * 2);
+            maskCtx.fill();
+        }
+
+        ctx.clearRect(0, 0, width, height);
+
+        if (!nakedImg.naturalWidth) {
+            requestAnimationFrame(render);
+            return;
+        }
+
+        // Calculate aspect ratio for object-fit: cover
+        const imgRatio = nakedImg.naturalWidth / nakedImg.naturalHeight;
+        const canvasRatio = width / height;
+        let drawWidth, drawHeight, offsetX, offsetY;
+
+        if (canvasRatio > imgRatio) {
+            drawWidth = width;
+            drawHeight = width / imgRatio;
+            offsetX = 0;
+            offsetY = (height - drawHeight) / 2;
+        } else {
+            drawWidth = height * imgRatio;
+            drawHeight = height;
+            offsetX = (width - drawWidth) / 2;
+            offsetY = 0;
+        }
+
+        // Draw the base image
+        ctx.globalCompositeOperation = 'source-over';
+        ctx.drawImage(nakedImg, offsetX, offsetY, drawWidth, drawHeight);
+
+        // Apply mask (Note: we draw maskCanvas without scaling because it's already scaled intrinsically, but wait - ctx.drawImage with a canvas source ignores the destination's current transform if we just pass 0,0? No, drawImage maps the source canvas (width*dpr x height*dpr) into the destination. Since we setTransform on ctx, drawing maskCanvas at (0,0) with size (width, height) is correct.)
+        ctx.globalCompositeOperation = 'destination-in';
+        ctx.drawImage(maskCanvas, 0, 0, width, height);
+
+        requestAnimationFrame(render);
+    }
+}
+
+function setupSplitText() {
+    const splitElements = document.querySelectorAll('[data-split]');
+    
+    splitElements.forEach(el => {
+        const text = el.innerText;
+        const words = text.split(' ').filter(w => w.trim().length > 0);
+        el.innerHTML = '';
+        
+        words.forEach((word, wordIndex) => {
+            const wordSpan = document.createElement('span');
+            wordSpan.className = 'word';
+            wordSpan.innerText = word;
+            
+            const delay = wordIndex * 0.04;
+            wordSpan.style.transitionDelay = `${delay}s`;
+            
+            el.appendChild(wordSpan);
+            
+            if (wordIndex < words.length - 1) {
+                const space = document.createElement('span');
+                space.className = 'space';
+                space.innerHTML = '&nbsp;';
+                el.appendChild(space);
+            }
+        });
+    });
+
+    const revealContainer = document.querySelector('[data-split-reveal]');
+    if (revealContainer && 'IntersectionObserver' in window) {
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach((entry) => {
+                if (!entry.isIntersecting) return;
+                entry.target.classList.add('is-visible');
+                observer.unobserve(entry.target);
+            });
+        }, { threshold: 0.3 });
+        observer.observe(revealContainer);
+    } else if (revealContainer) {
+        revealContainer.classList.add('is-visible');
+    }
+}
+
 setupHeroLoop();
 setupMagneticButtons();
 setupRevealObserver();
 setupMotionEngine();
+setupStoneEffect();
+setupSplitText();

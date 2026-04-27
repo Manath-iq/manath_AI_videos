@@ -478,6 +478,94 @@ h1 {
     opacity: 1;
     transform: translate3d(0, 0, 0);
 }
+/* --- Stone Section --- */
+.stone-section {
+    position: relative;
+    min-height: 100vh;
+    background: var(--color-bg);
+    overflow: hidden;
+    /* initial mask position at the center */
+    --x: 50%;
+    --y: 50%;
+}
+
+.stone-media,
+.stone-base,
+.stone-canvas,
+.stone-shade {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+}
+
+.stone-media {
+    z-index: 0;
+}
+
+.stone-base,
+.stone-canvas {
+    object-fit: cover;
+}
+
+.stone-canvas {
+    display: block;
+}
+
+.stone-shade {
+    background:
+        linear-gradient(90deg, rgba(9, 9, 8, 0.72) 0%, rgba(9, 9, 8, 0.2) 40%, rgba(9, 9, 8, 0) 100%),
+        linear-gradient(180deg, rgba(9, 9, 8, 0.1) 0%, rgba(9, 9, 8, 0.3) 60%, rgba(9, 9, 8, 0.8) 100%);
+    pointer-events: none;
+}
+
+.stone-layout {
+    position: relative;
+    z-index: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    min-height: 100vh;
+    padding-block: clamp(80px, 15vh, 140px);
+    pointer-events: none; /* Let mouse interact with background */
+    transition: transform 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+/* Split Text Animation */
+[data-split-reveal] .word {
+    display: inline-block;
+    opacity: 0;
+    transform: translateY(120%) rotate(4deg);
+    transition: opacity 0.8s cubic-bezier(0.16, 1, 0.3, 1), transform 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+[data-split-reveal] .space {
+    display: inline-block;
+    width: 0.25em;
+}
+
+[data-split-reveal].is-visible .word {
+    opacity: 1;
+    transform: translateY(0) rotate(0);
+}
+
+.stone-copy {
+    max-width: 540px;
+}
+
+.stone-copy h2 {
+    font-size: clamp(48px, 6vw, 76px);
+    font-weight: 500;
+    letter-spacing: -0.01em;
+    line-height: 0.95;
+    margin-bottom: 24px;
+}
+
+.stone-copy__lead {
+    color: var(--color-muted);
+    font-size: clamp(16px, 1.2vw, 19px);
+    line-height: 1.5;
+}
 
 @media (max-width: 980px) {
     :root {
