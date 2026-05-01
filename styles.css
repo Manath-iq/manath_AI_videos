@@ -10,7 +10,7 @@
     --font-body: 'Barlow', system-ui, sans-serif;
     --font-display: 'Instrument Serif', Georgia, serif;
     --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
-    --shell: min(1400px, calc(100vw - 40px));
+    --shell: min(1400px, calc(100vw - clamp(40px, 4vw, 80px)));
 }
 
 * {
@@ -191,6 +191,14 @@ svg {
     transform: translateX(-50%);
 }
 
+.site-header[data-reveal] {
+    transform: translate3d(-50%, 18px, 0);
+}
+
+.site-header[data-reveal].is-visible {
+    transform: translate3d(-50%, 0, 0);
+}
+
 .brand-mark {
     width: max-content;
     font-family: var(--font-display);
@@ -343,7 +351,7 @@ svg {
     min-height: 100dvh;
     grid-template-columns: minmax(0, 560px) 1fr;
     align-items: end;
-    padding-block: clamp(120px, 18vh, 190px) clamp(38px, 6vh, 64px);
+    padding-block: clamp(100px, 15vh, 190px) clamp(38px, 6vh, 64px);
 }
 
 .hero-copy {
@@ -386,12 +394,14 @@ h1 {
 }
 
 .hero-copy__lead {
-    max-width: 470px;
+    max-width: min(470px, 100%);
     margin-top: 22px;
     color: var(--color-muted);
     font-size: clamp(15px, 1.05vw, 18px);
     font-weight: 300;
     line-height: 1.5;
+    overflow-wrap: break-word;
+    text-wrap: pretty;
 }
 
 .hero-actions {
@@ -451,10 +461,10 @@ h1 {
     z-index: 1;
     display: grid;
     height: 100%;
-    grid-template-columns: minmax(300px, 420px) 1fr minmax(250px, 340px);
+    grid-template-columns: minmax(390px, 0.95fr) minmax(0, 1.2fr) minmax(280px, 0.85fr);
     align-items: center;
-    gap: clamp(26px, 5vw, 74px);
-    padding-block: clamp(74px, 12vh, 110px) clamp(34px, 7vh, 70px);
+    gap: clamp(18px, 2.6vw, 48px);
+    padding-block: clamp(56px, 9vh, 96px) clamp(30px, 6vh, 62px);
 }
 
 .motion-story,
@@ -553,8 +563,8 @@ h1 {
 /* Motion Meta — Glass Panel */
 .motion-meta {
     grid-column: 3;
-    align-self: end;
-    padding-bottom: min(9vh, 80px);
+    align-self: center;
+    padding-bottom: 0;
 }
 
 .motion-meta__headline {
@@ -665,7 +675,7 @@ h1 {
     display: flex;
     flex-direction: column;
     gap: 28px;
-    max-width: 540px;
+    max-width: min(540px, 50vw);
 }
 
 /* Stone Copy — Glass Panel */
@@ -750,6 +760,38 @@ h1 {
 /* RESPONSIVE                                   */
 /* ============================================ */
 
+/* ---- Mid-range desktops (MacBook 13-15", 1280–1440px) ---- */
+@media (max-width: 1380px) {
+    .motion-meta__headline {
+        font-size: clamp(36px, 4vw, 60px);
+    }
+
+    .motion-story h2 {
+        font-size: clamp(32px, 3.8vw, 60px);
+    }
+}
+
+@media (max-width: 1180px) {
+    .motion-layout {
+        grid-template-columns: minmax(340px, 1fr) minmax(0, 0.55fr) minmax(260px, 0.8fr);
+        gap: clamp(16px, 2vw, 32px);
+    }
+
+    .stone-content-wrap {
+        max-width: min(500px, 55vw);
+    }
+
+    .stone-stat {
+        padding: 18px 20px;
+        min-width: 160px;
+    }
+
+    .stone-stat__value {
+        font-size: clamp(26px, 3vw, 38px);
+    }
+}
+
+/* ---- Tablets and small desktops ---- */
 @media (max-width: 980px) {
     :root {
         --shell: min(100vw - 28px, 760px);
@@ -785,9 +827,36 @@ h1 {
         padding-top: 44px;
     }
 
+    .story-track {
+        min-height: clamp(168px, 24vh, 240px);
+        padding-left: 0;
+    }
+
+    .story-track__rail,
+    .story-track__progress {
+        display: none;
+    }
+
+    .story-step {
+        grid-area: 1 / 1;
+        opacity: 0;
+        pointer-events: none;
+        transform: translate3d(0, 14px, 0);
+    }
+
+    .story-step.is-active {
+        opacity: 1;
+        pointer-events: auto;
+        transform: translate3d(0, 0, 0);
+    }
+
     .motion-meta {
         width: min(100%, 360px);
         padding-bottom: 0;
+    }
+
+    .stone-content-wrap {
+        max-width: 100%;
     }
 
     .stone-stats {
@@ -832,6 +901,7 @@ h1 {
 
     .hero-copy__lead {
         font-size: 16px;
+        max-width: min(100%, 31ch);
     }
 
     .hero-actions {
@@ -852,6 +922,7 @@ h1 {
 
     .motion-story {
         padding-top: 34px;
+        width: 100%;
     }
 
     .motion-story h2 {
@@ -861,6 +932,7 @@ h1 {
     .story-track {
         gap: 17px;
         margin-top: 22px;
+        min-height: clamp(188px, 34vh, 250px);
     }
 
     .story-step h3 {
@@ -872,7 +944,7 @@ h1 {
     }
 
     .motion-meta__headline {
-        font-size: 42px;
+        font-size: clamp(34px, 10.5vw, 42px);
     }
 
     .glass-panel {
@@ -889,6 +961,96 @@ h1 {
 
     .stone-stat__value {
         font-size: 28px;
+    }
+}
+
+@media (max-height: 900px) and (min-width: 981px) {
+    .glass-panel {
+        padding: 20px;
+    }
+
+    .pill-chip {
+        margin-bottom: 12px;
+    }
+
+    .motion-layout {
+        grid-template-columns: minmax(320px, 0.78fr) minmax(0, 1.18fr) minmax(260px, 0.68fr);
+        gap: clamp(18px, 2vw, 40px);
+        padding-block: 72px 34px;
+    }
+
+    .motion-story {
+        max-height: calc(100svh - 116px);
+    }
+
+    .motion-story h2 {
+        font-size: clamp(34px, 5.4vh, 52px);
+    }
+
+    .story-track {
+        min-height: clamp(132px, 20vh, 172px);
+        display: grid;
+        gap: 0;
+        margin-top: 18px;
+        padding-left: 0;
+    }
+
+    .story-track__rail,
+    .story-track__progress {
+        display: none;
+    }
+
+    .story-step {
+        grid-area: 1 / 1;
+        opacity: 0;
+        pointer-events: none;
+        transform: translate3d(0, 12px, 0);
+    }
+
+    .story-step.is-active {
+        opacity: 1;
+        pointer-events: auto;
+        transform: translate3d(0, 0, 0);
+    }
+
+    .story-step__eyebrow {
+        margin-bottom: 4px;
+        font-size: 10px;
+    }
+
+    .story-step h3 {
+        margin-bottom: 5px;
+        font-size: 15px;
+    }
+
+    .story-step p:last-child {
+        font-size: clamp(13px, 1.65vh, 14px);
+        line-height: 1.48;
+    }
+
+    .motion-meta__headline {
+        font-size: clamp(40px, 7.2vh, 58px);
+    }
+
+    .motion-meta__links {
+        margin-top: 20px;
+    }
+
+    .stone-layout {
+        padding-block: 70px 46px;
+    }
+
+    .stone-content-wrap {
+        gap: 18px;
+    }
+
+    .stone-copy h2 {
+        margin-bottom: 14px;
+        font-size: clamp(42px, 4.8vw, 62px);
+    }
+
+    .stone-stat {
+        padding: 16px 18px;
     }
 }
 
