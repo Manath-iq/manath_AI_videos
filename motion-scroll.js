@@ -361,9 +361,54 @@ function setupSplitText() {
     }
 }
 
+function setupTiltCards() {
+    const cards = document.querySelectorAll('[data-tilt-card]');
+
+    cards.forEach((card) => {
+        const video = card.querySelector('video');
+
+        card.addEventListener('pointerenter', () => {
+            if (video) {
+                video.currentTime = 0;
+                video.play().catch(() => {});
+            }
+        });
+
+        card.addEventListener('pointerleave', () => {
+            card.style.transform = '';
+            if (video) {
+                video.pause();
+            }
+        });
+
+        card.addEventListener('pointermove', (e) => {
+            if (window.matchMedia('(pointer: coarse)').matches) return;
+
+            const rect = card.getBoundingClientRect();
+            const x = e.clientX - rect.left;
+            const y = e.clientY - rect.top;
+            const centerX = rect.width / 2;
+            const centerY = rect.height / 2;
+
+            const rotateY = ((x - centerX) / centerX) * 8;
+            const rotateX = ((centerY - y) / centerY) * 8;
+
+            card.style.transform =
+                `perspective(900px) rotateX(${rotateX.toFixed(2)}deg) rotateY(${rotateY.toFixed(2)}deg) scale3d(1.02, 1.02, 1.02)`;
+
+            // Light follow effect
+            const px = ((x / rect.width) * 100).toFixed(1);
+            const py = ((y / rect.height) * 100).toFixed(1);
+            card.style.setProperty('--mouse-x', px + '%');
+            card.style.setProperty('--mouse-y', py + '%');
+        });
+    });
+}
+
 setupHeroLoop();
 setupMagneticButtons();
 setupRevealObserver();
 setupMotionEngine();
 setupStoneEffect();
 setupSplitText();
+setupTiltCards();
